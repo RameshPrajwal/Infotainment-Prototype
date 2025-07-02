@@ -8,5 +8,7 @@
         <file>ui/assets/car-icon.png</file>
         <file>ui/assets/padlock.png</file>
         <file>ui/assets/unlock.png</file>
+        <file>ui/assets/search.png</file>
+        <file>ui/RightScreen/NavigationSearchBox.qml</file>
     </qresource>
 </RCC>
