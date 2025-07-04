@@ -10,5 +10,6 @@
         <file>ui/assets/unlock.png</file>
         <file>ui/assets/search.png</file>
         <file>ui/RightScreen/NavigationSearchBox.qml</file>
+        <file>ui/BottomBar/HVACComponent.qml</file>
     </qresource>
 </RCC>

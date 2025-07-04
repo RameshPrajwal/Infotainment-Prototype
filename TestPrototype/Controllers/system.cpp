@@ -5,7 +5,7 @@
 System::System(QObject *parent)
     : QObject{parent}
     , m_carLocked(true)
-    , m_outdoorTemp(64)
+    , m_outdoorTemp(21)
     , m_userName("Prajwal")
 {
     m_currentTimeTimer = new QTimer(this);

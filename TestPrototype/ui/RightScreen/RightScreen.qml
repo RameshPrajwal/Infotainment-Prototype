@@ -114,7 +114,7 @@ Rectangle{
 
 
 
-        text: systemHandler.outdoorTemp + "°F"
+        text: systemHandler.outdoorTemp + "°C"
     }
 
     Text {
