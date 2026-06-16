@@ -27,6 +27,15 @@ int main(int argc, char *argv[])
                 QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection);
+    // Read the secure macro string defined by qmake
+    QString apiKey = QString(THUNDERFOREST_API_KEY);
+
+    // Construct the complete tile query path safely.
+    // Use double percent signs (%%3F) so QString doesn't mistake %3 for an argument marker.
+    QString secureMapUrl = QString("http://tile.thunderforest.com/transport/%z/%x/%y.png?.arg(apiKey)&fake=.png");
+
+    // Pass the completed URL configuration into the QML runtime engine context
+    engine.rootContext()->setContextProperty("secureMapUrl", secureMapUrl);
     engine.load(url);
 
     QQmlContext * context ( engine.rootContext() );

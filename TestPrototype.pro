@@ -4,6 +4,18 @@ QT += quick
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+# 1. Read the key from a local environment variable named THUNDERFOREST_KEY
+API_KEY = $$(THUNDERFOREST_KEY)
+
+# 2. Provide a safe development fallback string if the variable is missing
+isEmpty(API_KEY) {
+    API_KEY = "DEVELOPMENT_KEY_MISSING"
+}
+
+# 3. Pass it to the C++ compiler as a preprocessor definition macro
+DEFINES += THUNDERFOREST_API_KEY=\\\"$$API_KEY\\\"
+
+
 SOURCES += \
         Controllers/hvachandler.cpp \
         Controllers/system.cpp \
