@@ -10,18 +10,25 @@ Rectangle{
         bottom: bottomBar.top
         right: parent.right
     }
-    Plugin {
-            id: mapPlugin
-            name: "osm"
-        }
 
     Map {
         id: map
         anchors.fill: parent
-        plugin: mapPlugin
+        plugin: Plugin {name: "osm"
+                        PluginParameter {
+                            name: "osm.mapping.providersrepository.disabled"
+                            value: "true"
+                        }
+                        PluginParameter {
+                                name: "osm.mapping.custom.host"
+                                value: secureMapUrl
+                            }
+        }
         center: QtPositioning.coordinate(48.13, 11.57) // Munich
-        zoomLevel: 14
+        zoomLevel: 10
         property geoCoordinate startCentroid
+        activeMapType: supportedMapTypes[supportedMapTypes.length - 1]
+
 
         PinchHandler {
             id: pinch
