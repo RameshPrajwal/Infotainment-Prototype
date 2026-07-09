@@ -17,6 +17,7 @@ DEFINES += THUNDERFOREST_API_KEY=\\\"$$API_KEY\\\"
 
 
 SOURCES += \
+        Controllers/audiocontroller.cpp \
         Controllers/hvachandler.cpp \
         Controllers/system.cpp \
         main.cpp
@@ -35,5 +36,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Controllers/audiocontroller.h \
     Controllers/hvachandler.h \
     Controllers/system.h
