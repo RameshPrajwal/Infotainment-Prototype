@@ -11,5 +11,10 @@
         <file>ui/assets/search.png</file>
         <file>ui/RightScreen/NavigationSearchBox.qml</file>
         <file>ui/BottomBar/HVACComponent.qml</file>
+        <file>ui/BottomBar/VolumeControlComponent.qml</file>
+        <file>ui/assets/volume-1.png</file>
+        <file>ui/assets/volume-2.png</file>
+        <file>ui/assets/volume-3.png</file>
+        <file>ui/assets/volume-mute.png</file>
     </qresource>
 </RCC>

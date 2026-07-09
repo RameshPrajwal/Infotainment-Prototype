@@ -1,46 +1,64 @@
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 
-Rectangle{
+Rectangle {
     id: bottomBar
-    anchors{
+    anchors {
         left: parent.left
         right: parent.right
         bottom: parent.bottom
     }
+
     color: "black"
     height: parent.height / 12
 
-    Image{
-      id: carSettingsIcon
-      anchors{
-          left: parent.left
-          leftMargin: 30
-          verticalCenter: parent.verticalCenter
-      }
-      height: parent.height * .85
-      fillMode: Image.PreserveAspectFit
-      source: "qrc:/ui/assets/car-icon.png"
-    }
+    RowLayout {
+        id: barLayout
+        anchors.fill: parent
+        anchors.leftMargin: 24
+        anchors.rightMargin: 24
+        anchors.topMargin: 6
+        anchors.bottomMargin: 6
+        spacing: 40
 
-    HVACComponent {
-        id: driverHVACControl
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-            left: carSettingsIcon.right
-            leftMargin: 150
-        }
-        hvacController: driverHVAC
-    }
+        Image {
+            id: carSettingsIcon
+            source: "qrc:/ui/assets/car-icon.png"
+            fillMode: Image.PreserveAspectFit
 
-    HVACComponent {
-        id: passengerHVACControl
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-            right: parent.right
-            rightMargin: 400
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: bottomBar.height * 0.9
+            Layout.preferredWidth: bottomBar.width * 0.1
         }
-        hvacController: passengerHVAC
+
+        HVACComponent {
+            id: driverHVACControl
+            hvacController: driverHVAC
+
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: bottomBar.height * 0.9
+            Layout.preferredWidth: bottomBar.width * 0.1
+        }
+
+        Item {
+                Layout.preferredWidth: 580
+            }
+
+        HVACComponent {
+            id: passengerHVACControl
+            hvacController: passengerHVAC
+
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: bottomBar.height * 0.9
+            Layout.preferredWidth:  bottomBar.width * 0.1
+        }
+
+        VolumeControlComponent {
+            id: volumeComponent
+
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: bottomBar.height * 0.9
+            Layout.preferredWidth:  bottomBar.width * 0.1
+        }
     }
 }
