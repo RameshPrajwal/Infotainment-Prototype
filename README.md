@@ -5,5 +5,4 @@ https://youtu.be/Tq-E6lqO6tM?si=buVVUFjIKHS056tV
 https://youtu.be/MEdJNc1tfwE?si=3rhBgMDuuJJISZMt
 
 
-The present implementation UI status:  ![present_working_image](HVAC.png)
-
+The present implementation UI status:  ![present_UI_implementation](present_UI_implementation.gif)
