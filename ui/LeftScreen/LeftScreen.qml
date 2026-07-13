@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import "../"
 
 Rectangle{
     id: leftScreen
@@ -10,11 +11,13 @@ Rectangle{
     }
     color: "white"
 
+    property alias carImageSource: carRender.source
+
     Image {
         id: carRender
         anchors.centerIn: parent
         width: parent.width * .85
         fillMode: Image.PreserveAspectFit
-        source: "qrc:/ui/assets/carRender.png"
+        source: CarViewState.currentLeftScreenSource
     }
 }

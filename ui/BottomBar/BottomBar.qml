@@ -19,46 +19,44 @@ Rectangle {
         anchors.rightMargin: 24
         anchors.topMargin: 6
         anchors.bottomMargin: 6
-        spacing: 40
+        spacing: 0
 
-        Image {
-            id: carSettingsIcon
-            source: "qrc:/ui/assets/car-icon.png"
-            fillMode: Image.PreserveAspectFit
-
+        CarRenderer {
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
             Layout.preferredWidth: bottomBar.width * 0.1
         }
+
+        Item { Layout.preferredWidth: bottomBar.width * 0.04 }
 
         HVACComponent {
             id: driverHVACControl
             hvacController: driverHVAC
-
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
             Layout.preferredWidth: bottomBar.width * 0.1
         }
 
-        Item {
-                Layout.preferredWidth: 580
-            }
+        Item { Layout.fillWidth: true }
 
         HVACComponent {
             id: passengerHVACControl
             hvacController: passengerHVAC
-
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
-            Layout.preferredWidth:  bottomBar.width * 0.1
+            Layout.preferredWidth: bottomBar.width * 0.1
         }
+
+        Item { Layout.preferredWidth: bottomBar.width * 0.04 }
 
         VolumeControlComponent {
             id: volumeComponent
-
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
-            Layout.preferredWidth:  bottomBar.width * 0.1
+            Layout.preferredWidth: bottomBar.width * 0.1
         }
     }
-}
+
+
+    }
+
