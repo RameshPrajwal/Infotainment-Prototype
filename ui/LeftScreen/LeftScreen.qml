@@ -9,7 +9,7 @@ Rectangle{
         right: rightScreen.left
         left: parent.left
     }
-    color: "white"
+    color: "#F2F1E6"
 
     property alias carImageSource: carRender.source
 
