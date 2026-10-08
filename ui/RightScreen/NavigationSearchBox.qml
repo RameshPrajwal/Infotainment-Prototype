@@ -5,6 +5,8 @@ Rectangle {
     radius: 5
     color: "#f0f0f0"
 
+    signal searchRequested(string query)
+
     Image{
        id: searchIcon
 
@@ -44,7 +46,15 @@ Rectangle {
        }
 
        verticalAlignment: Text.AlignVCenter
-       font.pixelSize: 16
+       font.pixelSize: 14
+
+       onAccepted: {
+                   const q = text.trim()
+                   if (q !== "")
+                       navSearchBox.searchRequested(q)
+                   text = ""
+                   focus = false
+              }
 
     }
 }

@@ -11,6 +11,29 @@ Rectangle{
         right: parent.right
     }
 
+    GeocodeModel {
+            id: geocodeModel
+            plugin: map.plugin
+            autoUpdate: false
+            limit: 1
+
+            onStatusChanged: {
+                if (status === GeocodeModel.Ready) {
+                    if (count > 0) {
+                        const coord = get(0).coordinate
+                        searchMarker.coordinate = coord
+                        searchMarker.visible = true
+                        map.center = coord
+                        map.zoomLevel = 14
+                    } else {
+                        console.warn("No result for", query)
+                    }
+                } else if (status === GeocodeModel.Error) {
+                    console.warn("Geocoding failed:", errorString)
+            }
+        }
+    }
+
     Map {
         id: map
         anchors.fill: parent
@@ -23,6 +46,18 @@ Rectangle{
                                 name: "osm.mapping.custom.host"
                                 value: secureMapUrl
                             }
+                        PluginParameter {
+                                    name: "osm.useragent"
+                                    value: "TeslaInfotainment/1.0"
+                                }
+                        PluginParameter {
+                            name: "osm.mapping.prefetching_style"
+                            value: "NoPrefetching"
+                        }
+                        PluginParameter {
+                            name: "osm.mapping.custom.datacopyright"
+                            value: "© OpenStreetMap contributors"
+                        }
         }
         center: QtPositioning.coordinate(48.13, 11.57) // Munich
         zoomLevel: 10
@@ -72,6 +107,19 @@ Rectangle{
             sequence: StandardKey.ZoomOut
             onActivated: map.zoomLevel = Math.round(map.zoomLevel - 1)
         }
+        MapQuickItem {
+                    id: searchMarker
+                    visible: false
+                    anchorPoint.x: pin.width / 2
+                    anchorPoint.y: pin.height / 2
+                    sourceItem: Rectangle {
+                        id: pin
+                        width: 18; height: 18; radius: 9
+                        color: "#e53935"
+                        border.color: "white"
+                        border.width: 3
+                    }
+                }
     }
     Image {
         id: lockIcon
@@ -152,6 +200,10 @@ Rectangle{
             top: lockIcon.bottom
             topMargin: 15
         }
+        onSearchRequested: (query) => {
+                    geocodeModel.query = query
+                    geocodeModel.update()
+                }
     }
 
     width: parent.width * 2/3
