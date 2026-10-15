@@ -1,0 +1,25 @@
+# Starts the infotainment UI at boot on the target board.
+# Install:
+#   sudo cp infotainment.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now infotainment
+#
+# QT_QPA_PLATFORM:
+#   eglfs   - fullscreen, no desktop (Raspberry Pi OS Lite, kiosk)
+#   wayland - run inside the Raspberry Pi OS desktop instead
+[Unit]
+Description=Infotainment Prototype (Qt)
+After=network-online.target systemd-user-sessions.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+SupplementaryGroups=video render input
+Environment=QT_QPA_PLATFORM=eglfs
+Environment=QT_QPA_EGLFS_HIDECURSOR=1
+ExecStart=/opt/TestPrototype/bin/TestPrototype
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

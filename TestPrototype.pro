@@ -31,8 +31,11 @@ QML_IMPORT_PATH =
 QML_DESIGNER_IMPORT_PATH =
 
 # Default rules for deployment.
+# On a target board (e.g. Raspberry Pi) Qt Creator copies the binary to
+# target.path. Override with: qmake DEPLOY_PATH=/home/pi/TestPrototype
+isEmpty(DEPLOY_PATH): DEPLOY_PATH = /opt/$${TARGET}/bin
 qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
+else: unix:!android: target.path = $$DEPLOY_PATH
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \

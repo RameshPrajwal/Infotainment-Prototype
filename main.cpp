@@ -30,16 +30,16 @@ int main(int argc, char *argv[])
         },
         Qt::QueuedConnection);
 
-    engine.rootContext()->setContextProperty(
-        "secureMapUrl", QStringLiteral("https://tile.openstreetmap.org/"));
-    engine.load(url);
-
-
+    // Context properties must be set before load(), otherwise the QML
+    // bindings are evaluated while these names are still undefined.
     QQmlContext * context ( engine.rootContext() );
+    context->setContextProperty("secureMapUrl", QStringLiteral("https://tile.openstreetmap.org/"));
     context->setContextProperty("systemHandler", &m_systemHandler );
     context->setContextProperty("driverHVAC", &m_driverHVACHandler );
     context->setContextProperty("passengerHVAC", &m_passengerHVACHandler );
     context->setContextProperty("audioController", &m_volumeLevel );
+
+    engine.load(url);
 
     return app.exec();
 }
