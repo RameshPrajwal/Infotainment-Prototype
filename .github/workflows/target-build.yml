@@ -1,0 +1,106 @@
+name: Target build (Raspberry Pi OS Trixie, arm64)
+
+# Builds the app for 64-bit ARM inside Debian 13 "Trixie", the base of the
+# current Raspberry Pi OS, so the binary uses the same Qt (6.8) and glibc as
+# the board. Then it starts the app on a virtual display and keeps a
+# screenshot of the startup screen.
+
+on:
+  push:
+    branches: [ main, master, target-build ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # only used to attach files to a release on tag pushes
+
+jobs:
+  arm64:
+    runs-on: ubuntu-24.04-arm          # native ARM64 machine, free for public repos
+    container: debian:trixie
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain, Qt 6 and test tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build file ca-certificates \
+            qt6-base-dev qt6-declarative-dev qt6-qpa-plugins \
+            qml6-module-qtquick qml6-module-qtquick-window \
+            qml6-module-qtquick-layouts qml6-module-qtqml-workerscript \
+            qml6-module-qtlocation qml6-module-qtpositioning \
+            libgl1-mesa-dri libglx-mesa0 libegl-mesa0 fonts-dejavu-core \
+            xvfb xauth imagemagick
+          # Map tile plugins are packaged separately on some Debian versions;
+          # install whichever of these exist.
+          extra=$(apt-cache --names-only search \
+            '^(qt6-location-plugins|qt6-positioning-plugins|libqt6location6-plugins)$' | cut -d' ' -f1)
+          if [ -n "$extra" ]; then
+            # shellcheck disable=SC2086
+            apt-get install -y --no-install-recommends $extra
+          fi
+          echo "Qt version: $(dpkg-query -W -f='${Version}' qt6-base-dev)"
+
+      - name: Build
+        env:
+          THUNDERFOREST_KEY: ${{ secrets.THUNDERFOREST_KEY }}
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+          file build/TestPrototype
+
+      - name: Start the app and take a screenshot
+        env:
+          QT_QPA_PLATFORM: xcb
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          mkdir -p out
+          xvfb-run -a -s "-screen 0 1280x720x24" sh -c '
+            ./build/TestPrototype > out/startup.log 2>&1 &
+            pid=$!
+            sleep 15
+            import -window root out/screenshot.png
+            if kill -0 $pid 2>/dev/null; then
+              echo "App is running after 15 s" ; kill $pid
+            else
+              echo "App exited during startup" ; exit 1
+            fi'
+          echo "---- startup log ----"
+          cat out/startup.log
+          if grep -qE 'is not installed|failed to load component|Cannot load library' out/startup.log; then
+            echo "::error::Missing QML module or plugin, see startup log above"
+            exit 1
+          fi
+
+      - name: Package
+        if: always()
+        run: |
+          cp build/TestPrototype out/ 2>/dev/null || true
+          cp deploy/infotainment.service out/ 2>/dev/null || true
+          tar czf TestPrototype-arm64-trixie.tar.gz -C out .
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: TestPrototype-arm64-trixie
+          path: |
+            TestPrototype-arm64-trixie.tar.gz
+            out/screenshot.png
+            out/startup.log
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apt-get install -y --no-install-recommends gh git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" --notes "Raspberry Pi OS Trixie (64-bit) build" \
+            TestPrototype-arm64-trixie.tar.gz out/screenshot.png \
+          || gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber \
+            TestPrototype-arm64-trixie.tar.gz out/screenshot.png
