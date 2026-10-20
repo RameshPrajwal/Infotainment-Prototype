@@ -36,6 +36,7 @@ Rectangle{
 
     Map {
         id: map
+        objectName: "map"
         anchors.fill: parent
         plugin: Plugin {name: "osm"
                         PluginParameter {
@@ -123,6 +124,7 @@ Rectangle{
     }
     Image {
         id: lockIcon
+        objectName: "lockIcon"
         anchors{
             left: parent.left
             top: parent.top
@@ -191,6 +193,7 @@ Rectangle{
 
     NavigationSearchBox{
         id:navSearchBox
+        objectName: "navSearch"
 
         width: parent.width *1/3
         height: parent.height * 1/12

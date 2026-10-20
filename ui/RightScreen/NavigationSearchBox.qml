@@ -36,6 +36,7 @@ Rectangle {
 
     TextInput {
        id: navigationTextInput
+       objectName: "input"
        clip: true
        anchors {
               top: parent.top

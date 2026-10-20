@@ -7,7 +7,10 @@ https://youtu.be/Tq-E6lqO6tM?si=buVVUFjIKHS056tV
 https://youtu.be/MEdJNc1tfwE?si=3rhBgMDuuJJISZMt
 
 
-The present implementation UI status:  ![present_UI_implementation](present_UI_implementation.gif)
+The present implementation UI status, recorded automatically from the latest `master`
+([feature check results](https://github.com/RameshPrajwal/Infotainment-Prototype/tree/ui-demo)):
+
+![UI demo](https://raw.githubusercontent.com/RameshPrajwal/Infotainment-Prototype/ui-demo/ui-demo.gif)
 
 ## Builds
 
@@ -23,3 +26,10 @@ and deploying to a Raspberry Pi with autostart are described in
 Download the latest arm64 build and its startup screenshot from the
 [Actions tab](https://github.com/RameshPrajwal/Infotainment-Prototype/actions/workflows/target-build.yml)
 (open a run → **Artifacts**), or from [Releases](https://github.com/RameshPrajwal/Infotainment-Prototype/releases) for tagged versions.
+
+## UI demo and feature checks
+
+Every pipeline run clicks through all UI features on a virtual display, checks that
+each one reacts, and records the walkthrough (`scripts/record-ui-demo.sh`). Pull
+requests get the GIF/MP4 as a downloadable artifact; merges to `master` replace the
+animation above automatically. See **[docs/ui-demo.md](docs/ui-demo.md)**.

@@ -2,8 +2,10 @@ name: Target build (Raspberry Pi OS Trixie, arm64)
 
 # Builds the app for 64-bit ARM inside Debian 13 "Trixie", the base of the
 # current Raspberry Pi OS, so the binary uses the same Qt (6.8) and glibc as
-# the board. Then it starts the app on a virtual display and keeps a
-# screenshot of the startup screen.
+# the board. Then it starts the app on a virtual display, keeps a screenshot
+# of the startup screen, and records a scripted walkthrough of every UI
+# feature (scripts/record-ui-demo.sh). On pushes to master the recording is
+# published to the "ui-demo" branch, which the README shows.
 
 on:
   push:
@@ -13,7 +15,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # only used to attach files to a release on tag pushes
+  contents: write   # publish the ui-demo branch and attach files to releases
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   arm64:
@@ -21,6 +27,9 @@ jobs:
     container: debian:trixie
     env:
       DEBIAN_FRONTEND: noninteractive
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
@@ -34,7 +43,8 @@ jobs:
             qml6-module-qtquick-layouts qml6-module-qtqml-workerscript \
             qml6-module-qtlocation qml6-module-qtpositioning \
             libgl1-mesa-dri libglx-mesa0 libegl-mesa0 fonts-dejavu-core \
-            xvfb xauth imagemagick
+            libxcb-cursor0 xvfb xauth imagemagick \
+            xdotool x11-xserver-utils ffmpeg jq git
           # Map tile plugins are packaged separately on some Debian versions;
           # install whichever of these exist.
           extra=$(apt-cache --names-only search \
@@ -76,12 +86,23 @@ jobs:
             exit 1
           fi
 
+      - name: Record UI demo and check every feature
+        run: |
+          scripts/record-ui-demo.sh build/TestPrototype out/ui-demo
+
+      - name: Write UI check results to the run summary
+        if: always()
+        run: |
+          if [ -f out/ui-demo/results.md ]; then
+            { echo "## UI feature checks"; echo; cat out/ui-demo/results.md; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Package
         if: always()
         run: |
-          cp build/TestPrototype out/ 2>/dev/null || true
-          cp deploy/infotainment.service out/ 2>/dev/null || true
-          tar czf TestPrototype-arm64-trixie.tar.gz -C out .
+          mkdir -p package
+          cp build/TestPrototype deploy/infotainment.service out/screenshot.png package/ 2>/dev/null || true
+          tar czf TestPrototype-arm64-trixie.tar.gz -C package .
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -91,6 +112,36 @@ jobs:
             TestPrototype-arm64-trixie.tar.gz
             out/screenshot.png
             out/startup.log
+            out/ui-demo/
+
+      # Replaces the whole "ui-demo" branch with a single new commit, so the
+      # README animation updates on every merge without adding commits to
+      # master and without the repository growing over time.
+      - name: Publish UI demo to the ui-demo branch
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir publish
+          cp out/ui-demo/ui-demo.gif out/ui-demo/ui-demo.mp4 out/ui-demo/results.md publish/
+          cd publish
+          cat > README.md <<EOF
+          # UI demo (generated)
+
+          Recorded automatically by [scripts/record-ui-demo.sh](../${GITHUB_REF_NAME}/scripts/record-ui-demo.sh)
+          from commit ${GITHUB_SHA} on ${GITHUB_REF_NAME}. This branch is replaced
+          on every push, so do not edit it.
+
+          ![UI demo](ui-demo.gif)
+
+          $(cat results.md)
+          EOF
+          git init -q -b ui-demo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "UI demo for ${GITHUB_SHA::7}"
+          git push --force -q "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ui-demo
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/v')
