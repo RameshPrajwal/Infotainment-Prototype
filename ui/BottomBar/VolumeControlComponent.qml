@@ -72,6 +72,7 @@ Item {
 
     Rectangle {
         id: decrementButton
+        objectName: "down"
         width: root.buttonWidth
         height: root.height
         radius: height / 6
@@ -97,6 +98,7 @@ Item {
 
     Rectangle {
         id: incrementButton
+        objectName: "up"
         width: root.buttonWidth
         height: root.height
         radius: height / 6

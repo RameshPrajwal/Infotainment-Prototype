@@ -22,6 +22,7 @@ Rectangle {
         spacing: 0
 
         CarRenderer {
+            objectName: "carView"
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
             Layout.preferredWidth: bottomBar.width * 0.1
@@ -31,6 +32,7 @@ Rectangle {
 
         HVACComponent {
             id: driverHVACControl
+            objectName: "driverHVAC"
             hvacController: driverHVAC
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
@@ -41,6 +43,7 @@ Rectangle {
 
         HVACComponent {
             id: passengerHVACControl
+            objectName: "passengerHVAC"
             hvacController: passengerHVAC
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
@@ -51,6 +54,7 @@ Rectangle {
 
         VolumeControlComponent {
             id: volumeComponent
+            objectName: "volume"
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: bottomBar.height * 0.9
             Layout.preferredWidth: bottomBar.width * 0.1

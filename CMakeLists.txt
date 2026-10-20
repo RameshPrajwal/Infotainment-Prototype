@@ -22,6 +22,7 @@ add_executable(TestPrototype
     Controllers/audiocontroller.cpp Controllers/audiocontroller.h
     Controllers/hvachandler.cpp     Controllers/hvachandler.h
     Controllers/system.cpp          Controllers/system.h
+    Testing/uilocator.cpp           Testing/uilocator.h
     qml.qrc
 )
 

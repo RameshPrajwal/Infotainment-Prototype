@@ -8,6 +8,7 @@ Item {
 
     Image {
             id: carSettingsIcon
+            objectName: "front"
             anchors.centerIn: parent
             width: parent.width * 0.7
             height: parent.height
@@ -24,6 +25,7 @@ Item {
 
     Rectangle {
         id: decrementButton
+        objectName: "left"
         anchors {
             left: parent.left
             top: parent.top
@@ -50,6 +52,7 @@ Item {
 
     Rectangle {
         id: incrementButton
+        objectName: "right"
         anchors {
             right: parent.right
             top: parent.top

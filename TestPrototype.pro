@@ -20,6 +20,7 @@ SOURCES += \
         Controllers/audiocontroller.cpp \
         Controllers/hvachandler.cpp \
         Controllers/system.cpp \
+        Testing/uilocator.cpp \
         main.cpp
 
 RESOURCES += qml.qrc
@@ -41,4 +42,5 @@ else: unix:!android: target.path = $$DEPLOY_PATH
 HEADERS += \
     Controllers/audiocontroller.h \
     Controllers/hvachandler.h \
-    Controllers/system.h
+    Controllers/system.h \
+    Testing/uilocator.h

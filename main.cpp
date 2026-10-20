@@ -5,6 +5,7 @@
 #include <Controllers/system.h>
 #include <Controllers/hvachandler.h>
 #include <Controllers/audiocontroller.h>
+#include <Testing/uilocator.h>
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +40,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("passengerHVAC", &m_passengerHVACHandler );
     context->setContextProperty("audioController", &m_volumeLevel );
 
+    UiLocator::installFromEnvironment(engine);   // no-op unless UI_LOCATOR_FILE is set
     engine.load(url);
 
     return app.exec();

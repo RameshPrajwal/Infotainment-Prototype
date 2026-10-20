@@ -124,6 +124,7 @@ Rectangle {
 
     Image {
         id: carRender
+        objectName: "leftCarImage"
         anchors.centerIn: parent
         width: parent.width * .85
         fillMode: Image.PreserveAspectFit

@@ -5,6 +5,7 @@ Item {
     property var hvacController
     Rectangle {
         id: decrementButton
+        objectName: "down"
         anchors {
             left: parent.left
             top: parent.top
@@ -41,6 +42,7 @@ Item {
 
     Rectangle {
         id: incrementButton
+        objectName: "up"
         anchors {
             left: targetTemperatureText.right
             leftMargin: 15
