@@ -13,7 +13,7 @@
 # Exit code is non-zero if a required step failed or the app crashed.
 #
 # Needs: Xvfb, xdotool, ffmpeg, jq, libxcb-cursor0 (Qt >= 6.5 on X11),
-#        optionally xsetroot (x11-xserver-utils) and fonts-dejavu-core.
+#        optionally fonts-dejavu-core (captions).
 #
 # ---------------------------------------------------------------------------
 # Adding a new feature to the demo: add lines to scenario() below.
@@ -28,6 +28,10 @@
 #   pause <seconds>    caption "<text>" <seconds>
 # Elements are found by objectName (see UI_LOCATOR_FILE in Testing/uilocator.h).
 # Run the app with UI_LOCATOR_FILE=/tmp/ui.json to list all available names.
+#
+# Coverage: at the end the script lists every interactive element of the app
+# that no step used, and clickable elements without an objectName. These are
+# warnings; set DEMO_REQUIRE_COVERAGE=1 to make them fail the run.
 # ---------------------------------------------------------------------------
 
 scenario() {
@@ -50,11 +54,16 @@ scenario() {
     step "Volume down"               required volume         click volume.down 8
     pause 1.2
 
-    step "Search for a place"        optional map@130,0,30,0 search "Marienplatz, Munich"
-    pause 2
-    step "Pan the map"               optional map@130,0,30,0 drag map -250 120
+    # Map tour: three places, zooming in and out between them. Optional,
+    # because tiles and place search come from OpenStreetMap over the internet.
+    step "Find Marienplatz"          optional map@130,0,30,0 search "Marienplatz, Munich"
+    step "Zoom in"                   optional map@130,0,30,0 scroll map up 2
+    step "Zoom out to the city"      optional map@130,0,30,0 scroll map down 4
+    step "Find Olympiapark"          optional map@130,0,30,0 search "Olympiapark, Munich"
+    step "Zoom in"                   optional map@130,0,30,0 scroll map up 1
+    step "Find Allianz Arena"        optional map@130,0,30,0 search "Allianz Arena, Munich"
+    step "Pan the map"               optional map@130,0,30,0 drag map -220 100
     step "Zoom out"                  optional map@130,0,30,0 scroll map down 3
-    pause 1.5
 
     caption "Infotainment Prototype" 2
 }
@@ -95,8 +104,6 @@ cleanup() {
 }
 trap cleanup EXIT
 for _ in $(seq 50); do xdotool getmouselocation >/dev/null 2>&1 && break; sleep 0.1; done
-# Normal arrow pointer instead of X11's default "X" over areas without a cursor.
-command -v xsetroot >/dev/null && xsetroot -cursor_name left_ptr
 
 # ---- start the app ----------------------------------------------------------
 log "Starting $APP on $DISPLAY"
@@ -111,6 +118,8 @@ sleep 1   # let the first layout settle and map tiles start loading
 xdotool mousemove $((W / 2)) $((H / 2))
 
 # ---- helpers ------------------------------------------------------------------
+USED="$WORK/used.txt"; : > "$USED"     # elements the scenario interacted with
+use() { echo "${1%%@*}" >> "$USED"; }
 now() { date +%s.%N; }
 elapsed() { awk -v a="$T0" -v b="$(now)" 'BEGIN { printf "%.2f", b - a }'; }
 
@@ -148,6 +157,7 @@ glide() {   # move the pointer smoothly so viewers can follow it
 
 do_click() {
     local times=${2:-1} i
+    use "$1"
     center "$1" || return 1
     glide "$CX" "$CY"
     for ((i = 0; i < times; i++)); do
@@ -163,15 +173,24 @@ do_click() {
 }
 
 do_search() {
+    local base i
     do_click navSearch.input || return 1
     xdotool type --delay 80 "$1"
     sleep 0.3
+    base=$(region_hash "${CHECK_REGION:-map}")
     xdotool key Return
-    sleep 3   # geocoding goes over the network
+    # Place search goes over the network: wait until the map moves (max 8 s),
+    # then give the new tiles time to load.
+    for i in $(seq 16); do
+        sleep 0.5
+        [ "$(region_hash "${CHECK_REGION:-map}")" != "$base" ] && break
+    done
+    if [ "$i" -lt 16 ]; then sleep 2; fi   # no move: the step check reports it
 }
 
 do_drag() {
     local dx=$2 dy=$3 i
+    use "$1"
     center "$1" || return 1
     glide "$CX" "$CY"
     echo "tap $(elapsed) $CX $CY" >> "$EVENTS"
@@ -186,10 +205,12 @@ do_drag() {
 do_scroll() {
     local button=4 i
     [ "$2" = down ] && button=5
+    use "$1"
     center "$1" || return 1
     glide "$CX" "$CY"
-    for ((i = 0; i < $3; i++)); do xdotool click "$button"; sleep 0.3; done
-    sleep 1.5
+    # One zoom level per wheel step, slow enough to see each level load.
+    for ((i = 0; i < $3; i++)); do xdotool click "$button"; sleep 0.7; done
+    sleep 1.2
 }
 
 run_action() {
@@ -256,6 +277,31 @@ sleep 0.5
 scenario
 
 kill -INT "$FFMPEG_PID"; wait "$FFMPEG_PID" 2>/dev/null; FFMPEG_PID=
+
+# ---- coverage: interactive elements no step used --------------------------------
+UNCOVERED=$(jq -r 'to_entries[] | select(.value.interactive) | .key' "$LOC" | sed 's/#[0-9]*$//' | sort -u \
+            | grep -vxF -f <(sort -u "$USED") || true)
+TOTAL=$(jq '[.[] | select(.interactive)] | length' "$LOC")
+{
+    printf '\n**Coverage:** '
+    if [ -z "$UNCOVERED" ]; then
+        printf 'all %s interactive elements are used by the demo ✅\n' "$TOTAL"
+    else
+        printf '⚠️ not tested by the demo yet (add a step in scripts/record-ui-demo.sh):\n\n'
+        while read -r e; do
+            # shellcheck disable=SC2016  # backticks are Markdown here
+            case $e in
+                "(unnamed"*) printf -- '- `%s`: give it an `objectName` first\n' "$e" ;;
+                *)           printf -- '- `%s`\n' "$e" ;;
+            esac
+        done <<< "$UNCOVERED"
+    fi
+} >> "$RESULTS"
+if [ -n "$UNCOVERED" ]; then
+    log "Not covered by the demo: $(echo "$UNCOVERED" | paste -sd, -)"
+    [ -n "${GITHUB_ACTIONS:-}" ] && echo "::warning title=UI demo coverage::Not tested by the demo yet: $(echo "$UNCOVERED" | paste -sd, - | sed 's/,/, /g')"
+    [ "${DEMO_REQUIRE_COVERAGE:-0}" = 1 ] && FAILED=1
+fi
 if kill -0 "$APP_PID" 2>/dev/null; then
     kill "$APP_PID"
 else

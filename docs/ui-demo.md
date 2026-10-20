@@ -5,9 +5,12 @@ After the build, `scripts/record-ui-demo.sh`:
 
 1. starts the app on a virtual 1280x720 display (Xvfb),
 2. records the screen with ffmpeg,
-3. clicks through every feature with xdotool, like a user would,
+3. clicks through every feature with xdotool, like a user would, including a map
+   tour: it searches Marienplatz, Olympiapark and Allianz Arena and zooms in and
+   out between them,
 4. checks after each step that the part of the screen it expects really changed,
-5. renders `ui-demo.mp4` (captions and red tap markers) and `ui-demo.gif`.
+5. lists any clickable element of the app that no step tested (coverage),
+6. renders `ui-demo.mp4` (captions and red tap markers) and `ui-demo.gif`.
 
 ```mermaid
 flowchart LR
@@ -22,7 +25,8 @@ flowchart LR
 
 | What | Where |
 |---|---|
-| Pass/fail per feature | The run's **Summary** page → "UI feature checks" |
+| Pass/fail per feature, coverage | The run's **Summary** page → "UI feature checks" |
+| Untested new elements | A yellow warning annotation on the run / pull request |
 | GIF, MP4, app log | The run's **Artifacts** → `TestPrototype-arm64-trixie` → `ui-demo/` |
 | Latest `master` demo | The README, and the [`ui-demo` branch](https://github.com/RameshPrajwal/Infotainment-Prototype/tree/ui-demo) |
 
@@ -51,6 +55,25 @@ So:
 
 The publish step only runs when every required check passed. If you protect "all
 branches" against force pushes in a ruleset later, exclude `ui-demo`.
+
+## Are new features tested automatically?
+
+Partly. The *steps* are written by hand: the script can't know what a new button
+is supposed to do, so it can't check it on its own. But the pipeline *notices* new
+features you haven't added a step for:
+
+- The app reports every element that reacts to clicks, typing or dragging
+  (MouseArea, TextInput, buttons, Tap/Drag handlers).
+- After the demo, every such element that no step used is listed under
+  **Coverage** in the results, and as a warning on the pull request:
+  "Not tested by the demo yet: seatHeater".
+- A clickable element without an `objectName` is listed as e.g.
+  `(unnamed MouseArea in leftScreen)`, because the demo can't reach it until it
+  has a name.
+
+These are warnings, so a feature can be merged before its demo step exists. To
+make the pipeline fail instead, set `DEMO_REQUIRE_COVERAGE: "1"` as an `env:` on
+the "Record UI demo" step in the workflow.
 
 ## Adding a new feature to the demo
 
@@ -93,7 +116,7 @@ exactly as before.
 ## Running it on your own Linux machine
 
 ```bash
-sudo apt install xvfb xdotool ffmpeg jq libxcb-cursor0 x11-xserver-utils fonts-dejavu-core
+sudo apt install xvfb xdotool ffmpeg jq libxcb-cursor0 fonts-dejavu-core
 scripts/record-ui-demo.sh build/TestPrototype ui-demo
 ```
 

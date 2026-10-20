@@ -44,7 +44,7 @@ jobs:
             qml6-module-qtlocation qml6-module-qtpositioning \
             libgl1-mesa-dri libglx-mesa0 libegl-mesa0 fonts-dejavu-core \
             libxcb-cursor0 xvfb xauth imagemagick \
-            xdotool x11-xserver-utils ffmpeg jq git
+            xdotool ffmpeg jq git
           # Map tile plugins are packaged separately on some Debian versions;
           # install whichever of these exist.
           extra=$(apt-cache --names-only search \
