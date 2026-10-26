@@ -4,6 +4,7 @@
         <file>ui/BottomBar/BottomBar.qml</file>
         <file>ui/RightScreen/RightScreen.qml</file>
         <file>ui/LeftScreen/LeftScreen.qml</file>
+        <file>ui/LeftScreen/CarHotspot.qml</file>
         <file>ui/assets/padlock.png</file>
         <file>ui/assets/unlock.png</file>
         <file>ui/assets/search.png</file>
@@ -18,8 +19,14 @@
         <file>ui/assets/car-icon-left.png</file>
         <file>ui/assets/car-icon-right.png</file>
         <file>ui/assets/front-facing-carimage.png</file>
-        <file>ui/assets/left-facing-carimage.png</file>
-        <file>ui/assets/right-facing-carimage.png</file>
+        <file>ui/assets/car/car-left-closed.png</file>
+        <file>ui/assets/car/car-left-frunk.png</file>
+        <file>ui/assets/car/car-left-trunk.png</file>
+        <file>ui/assets/car/car-left-both.png</file>
+        <file>ui/assets/car/car-right-closed.png</file>
+        <file>ui/assets/car/car-right-frunk.png</file>
+        <file>ui/assets/car/car-right-trunk.png</file>
+        <file>ui/assets/car/car-right-both.png</file>
         <file>ui/BottomBar/CarRenderer.qml</file>
         <file>ui/CarViewState.qml</file>
         <file>ui/qmldir</file>
