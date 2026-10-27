@@ -1,0 +1,50 @@
+# C++ formatting rules, applied automatically to pull requests by
+# .github/workflows/format.yml. Close to the Qt coding style.
+# Format locally with:  clang-format -i <files>   (version 18 matches CI)
+---
+Language: Cpp
+BasedOnStyle: WebKit
+Standard: c++17
+ColumnLimit: 120
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Braces: own line for classes and functions, same line for control statements
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterStruct: true
+  AfterEnum: false
+  AfterNamespace: false
+  AfterControlStatement: Never
+  BeforeElse: false
+  BeforeCatch: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+
+AccessModifierOffset: -4
+NamespaceIndentation: None
+PointerAlignment: Right
+ReferenceAlignment: Right
+BreakConstructorInitializers: BeforeComma
+PackConstructorInitializers: Never
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+SpaceAfterTemplateKeyword: false
+FixNamespaceComments: true
+SpacesInParentheses: false
+Cpp11BracedListStyle: true
+SpaceBeforeCpp11BracedList: false
+SpaceInEmptyBlock: false
+
+# Keep include order as written (some headers depend on order)
+SortIncludes: Never
+
+# Qt macros that are statements, not function calls
+StatementMacros: [Q_OBJECT, Q_GADGET, Q_UNUSED, QT_REQUIRE_VERSION]
+AttributeMacros: [Q_DECL_EXPORT, Q_DECL_IMPORT]
+...

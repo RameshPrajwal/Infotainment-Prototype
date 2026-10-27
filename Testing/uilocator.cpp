@@ -45,16 +45,15 @@ QString describe(const QQuickItem *item)
             break;
         }
     }
-    return QStringLiteral("(unnamed %1 in %2)")
-        .arg(typeName(item), where.isEmpty() ? QStringLiteral("window") : where);
+    return QStringLiteral("(unnamed %1 in %2)").arg(typeName(item), where.isEmpty() ? QStringLiteral("window") : where);
 }
 
 // Things a user can click, type into or drag.
 bool isInputItem(const QObject *obj)
 {
-    return obj->inherits("QQuickMouseArea") || obj->inherits("QQuickTextInput")
-        || obj->inherits("QQuickTextEdit") || obj->inherits("QQuickAbstractButton")
-        || obj->inherits("QQuickPointerHandler");   // TapHandler, DragHandler, ...
+    return obj->inherits("QQuickMouseArea") || obj->inherits("QQuickTextInput") || obj->inherits("QQuickTextEdit")
+        || obj->inherits("QQuickAbstractButton")
+        || obj->inherits("QQuickPointerHandler"); // TapHandler, DragHandler, ...
 }
 
 // An item is interactive if it handles input itself, or through an unnamed
@@ -63,7 +62,7 @@ bool isInteractive(const QQuickItem *item)
 {
     if (isInputItem(item))
         return true;
-    const auto children = item->children();   // includes handlers, which are not items
+    const auto children = item->children(); // includes handlers, which are not items
     for (const QObject *child : children) {
         if (child->objectName().isEmpty() && isInputItem(child))
             return true;
@@ -78,13 +77,14 @@ void addEntry(QJsonObject &out, QString key, const QQuickItem *item, bool intera
         key = base + QLatin1Char('#') + QString::number(n);
 
     const QPointF topLeft = item->mapToGlobal(QPointF(0, 0));
-    out.insert(key, QJsonObject{
-        { QStringLiteral("x"), qRound(topLeft.x()) },
-        { QStringLiteral("y"), qRound(topLeft.y()) },
-        { QStringLiteral("w"), qRound(item->width()) },
-        { QStringLiteral("h"), qRound(item->height()) },
-        { QStringLiteral("interactive"), interactive },
-    });
+    out.insert(key,
+        QJsonObject{
+            {QStringLiteral("x"), qRound(topLeft.x())},
+            {QStringLiteral("y"), qRound(topLeft.y())},
+            {QStringLiteral("w"), qRound(item->width())},
+            {QStringLiteral("h"), qRound(item->height())},
+            {QStringLiteral("interactive"), interactive},
+        });
 }
 
 void collect(const QQuickItem *item, QJsonObject &out)
@@ -95,8 +95,7 @@ void collect(const QQuickItem *item, QJsonObject &out)
     if (item->width() > 0 && item->height() > 0) {
         if (!item->objectName().isEmpty()) {
             addEntry(out, namedPath(item), item, isInteractive(item));
-        } else if (isInputItem(item)
-                   && !(item->parentItem() && !item->parentItem()->objectName().isEmpty())) {
+        } else if (isInputItem(item) && !(item->parentItem() && !item->parentItem()->objectName().isEmpty())) {
             // Clickable but no objectName on it or its parent: the demo cannot
             // reach it. Reported so the pipeline can ask for a name.
             addEntry(out, describe(item), item, true);
@@ -113,7 +112,7 @@ void writeLocations(QQuickWindow *window, const QString &path)
     QJsonObject items;
     collect(window->contentItem(), items);
 
-    QSaveFile file(path);   // atomic replace, readers never see half a file
+    QSaveFile file(path); // atomic replace, readers never see half a file
     if (file.open(QIODevice::WriteOnly)) {
         file.write(QJsonDocument(items).toJson(QJsonDocument::Indented));
         file.commit();
@@ -132,14 +131,12 @@ void UiLocator::installFromEnvironment(QQmlApplicationEngine &engine)
     // so areas without their own cursor would show X11's "X". Use an arrow.
     QGuiApplication::setOverrideCursor(Qt::ArrowCursor);
 
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &engine,
-                     [path](QObject *obj, const QUrl &) {
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &engine, [path](QObject *obj, const QUrl &) {
         auto *window = qobject_cast<QQuickWindow *>(obj);
         if (!window)
             return;
         auto *timer = new QTimer(window);
-        QObject::connect(timer, &QTimer::timeout, window,
-                         [window, path] { writeLocations(window, path); });
+        QObject::connect(timer, &QTimer::timeout, window, [window, path] { writeLocations(window, path); });
         timer->start(1000);
     });
 }

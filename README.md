@@ -33,3 +33,14 @@ Every pipeline run clicks through all UI features on a virtual display, checks t
 each one reacts, and records the walkthrough (`scripts/record-ui-demo.sh`). Pull
 requests get the GIF/MP4 as a downloadable artifact; merges to `master` replace the
 animation above automatically. See **[docs/ui-demo.md](docs/ui-demo.md)**.
+
+## Code formatting
+
+C++ code is formatted with clang-format 18 using the rules in [.clang-format](.clang-format).
+On every pull request, CI formats the changed code and commits the fixes back to the
+branch (`.github/workflows/format.yml`), so run `git pull` after pushing if CI added a
+"style: apply clang-format" commit. To format locally before pushing:
+
+```
+clang-format -i main.cpp Controllers/*.cpp Controllers/*.h Testing/*.cpp Testing/*.h
+```

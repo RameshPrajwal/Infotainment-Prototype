@@ -1,0 +1,68 @@
+name: Format (clang-format)
+
+# Formats the C++ sources of every pull request with clang-format, using the
+# rules in .clang-format. If anything changes, the formatted files are
+# committed back to the pull request branch, so unformatted code never
+# reaches master.
+#
+# Pull requests from forks cannot be pushed to; for those the job fails and
+# shows the changes needed instead.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # push the formatting commit to the PR branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-24.04
+    env:
+      CLANG_FORMAT: clang-format-18   # keep in sync with the version noted in .clang-format
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The PR branch itself (not GitHub's temporary merge commit),
+          # so a fix can be pushed back to it.
+          ref: ${{ github.head_ref || github.ref_name }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends "$CLANG_FORMAT"
+          "$CLANG_FORMAT" --version
+
+      - name: Format C++ sources
+        run: |
+          git ls-files -z '*.cpp' '*.h' '*.hpp' '*.cc' | xargs -0 -r "$CLANG_FORMAT" -i
+          if git diff --quiet; then
+            echo "All C++ files are formatted."
+          else
+            echo "Files changed by clang-format:"
+            git diff --stat
+          fi
+
+      - name: Commit formatting fixes to the pull request
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "style: apply clang-format"
+          git push
+          echo "::notice title=clang-format::Formatting fixes were committed to this pull request. Run 'git pull' before pushing again."
+
+      - name: Fail if a fork's code is not formatted
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          if ! git diff --quiet; then
+            git diff
+            echo "::error title=clang-format::Code is not formatted. Run clang-format-18 -i on the files above."
+            exit 1
+          fi

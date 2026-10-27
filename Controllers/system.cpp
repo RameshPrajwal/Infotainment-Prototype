@@ -9,9 +9,9 @@ System::System(QObject *parent)
     , m_userName("Prajwal")
 {
     m_currentTimeTimer = new QTimer(this);
-    m_currentTimeTimer->setInterval( 500 );
-    m_currentTimeTimer -> setSingleShot( true );
-    connect( m_currentTimeTimer, &QTimer::timeout, this, &System::currentTimeTimerTimeout );
+    m_currentTimeTimer->setInterval(500);
+    m_currentTimeTimer->setSingleShot(true);
+    connect(m_currentTimeTimer, &QTimer::timeout, this, &System::currentTimeTimerTimeout);
 
     currentTimeTimerTimeout();
 }
@@ -75,7 +75,7 @@ void System::currentTimeTimerTimeout()
     QDateTime dateTime;
     QString currentTime = dateTime.currentDateTime().toString("hh:mm ap");
 
-    //qDebug() << currentTime;
+    // qDebug() << currentTime;
 
     setCurrentTime(currentTime);
 

@@ -2,9 +2,8 @@
 
 HVACHandler::HVACHandler(QObject *parent)
     : QObject{parent}
-    , m_targetTemperature( 23 )
-{
-}
+    , m_targetTemperature(23)
+{}
 
 int HVACHandler::targetTemperature() const
 {
@@ -14,7 +13,7 @@ int HVACHandler::targetTemperature() const
 void HVACHandler::incrementTargetTemperature(const int &val)
 {
     int newTargetTemp = m_targetTemperature + val;
-    setTargetTemperature( newTargetTemp );
+    setTargetTemperature(newTargetTemp);
 }
 
 void HVACHandler::setTargetTemperature(int newTargetTemperature)

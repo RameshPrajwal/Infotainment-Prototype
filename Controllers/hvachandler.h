@@ -12,7 +12,7 @@ public:
 
     int targetTemperature() const;
 
-    Q_INVOKABLE void incrementTargetTemperature( const int & val );
+    Q_INVOKABLE void incrementTargetTemperature(const int &val);
 
 public slots:
     void setTargetTemperature(int newTargetTemperature);
