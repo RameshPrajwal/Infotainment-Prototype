@@ -5,8 +5,7 @@ VehicleState::VehicleState(QObject *parent)
     , m_frunkOpen(false)
     , m_trunkOpen(false)
     , m_charging(false)
-{
-}
+{}
 
 bool VehicleState::frunkOpen() const
 {

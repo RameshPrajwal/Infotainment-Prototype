@@ -46,7 +46,7 @@ private:
     int m_outdoorTemp;
     QString m_userName;
     QString m_currentTime;
-    QTimer * m_currentTimeTimer;
+    QTimer *m_currentTimeTimer;
 };
 
 #endif // SYSTEM_H

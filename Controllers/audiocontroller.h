@@ -12,7 +12,7 @@ public:
 
     int volumeLevel() const;
 
-    Q_INVOKABLE void incrementVolumeLevel( const int & val );
+    Q_INVOKABLE void incrementVolumeLevel(const int &val);
 
 public slots:
     void setVolumeLevel(int newVolumeLevel);
