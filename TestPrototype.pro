@@ -20,6 +20,7 @@ SOURCES += \
         Controllers/audiocontroller.cpp \
         Controllers/hvachandler.cpp \
         Controllers/system.cpp \
+        Controllers/vehiclestate.cpp \
         Testing/uilocator.cpp \
         main.cpp
 
@@ -43,4 +44,5 @@ HEADERS += \
     Controllers/audiocontroller.h \
     Controllers/hvachandler.h \
     Controllers/system.h \
+    Controllers/vehiclestate.h \
     Testing/uilocator.h

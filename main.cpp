@@ -5,6 +5,7 @@
 #include <Controllers/system.h>
 #include <Controllers/hvachandler.h>
 #include <Controllers/audiocontroller.h>
+#include <Controllers/vehiclestate.h>
 #include <Testing/uilocator.h>
 
 int main(int argc, char *argv[])
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     HVACHandler m_driverHVACHandler;
     HVACHandler m_passengerHVACHandler;
     audioController m_volumeLevel;
+    VehicleState m_vehicleState;
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -39,6 +41,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("driverHVAC", &m_driverHVACHandler );
     context->setContextProperty("passengerHVAC", &m_passengerHVACHandler );
     context->setContextProperty("audioController", &m_volumeLevel );
+    context->setContextProperty("vehicleState", &m_vehicleState );
 
     UiLocator::installFromEnvironment(engine);   // no-op unless UI_LOCATOR_FILE is set
     engine.load(url);

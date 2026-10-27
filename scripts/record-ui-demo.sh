@@ -40,8 +40,20 @@ scenario() {
     step "Unlock the car"            required lockIcon       click lockIcon
     step "Lock the car"              required lockIcon       click lockIcon
 
-    step "Car view: right side"      required leftCarImage   click carView.right
+    
     step "Car view: left side"       required leftCarImage   click carView.left
+    step "Car view: right side"      required leftCarImage   click carView.right
+
+    step "Open the frunk"            required leftCarImage   click frunkHotspot
+    step "Open the trunk"            required leftCarImage   click trunkHotspot
+    step "Close the frunk"           required leftCarImage   click frunkHotspot
+    step "Close the trunk"           required leftCarImage   click trunkHotspot
+    step "Start charging"            required chargePortButton click chargePortButton
+    step "Stop charging"             required chargePortButton click chargePortButton
+    # The top bar lock must follow the lock on the car view.
+    step "Unlock from the car view"  required lockIcon       click carLockButton
+    step "Lock from the car view"    required lockIcon       click carLockButton
+
     step "Car view: front"           required leftCarImage   click carView.front
 
     step "Driver temperature up"     required driverHVAC     click driverHVAC.up 3
