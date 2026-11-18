@@ -56,8 +56,6 @@ jobs:
           echo "Qt version: $(dpkg-query -W -f='${Version}' qt6-base-dev)"
 
       - name: Build
-        env:
-          THUNDERFOREST_KEY: ${{ secrets.THUNDERFOREST_KEY }}
         run: |
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build
