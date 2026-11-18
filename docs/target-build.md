@@ -49,9 +49,6 @@ container. It:
 Pushing a tag such as `v0.2` also attaches the tarball and screenshot to a GitHub
 Release.
 
-If you use a Thunderforest key, add it as a repository secret named
-`THUNDERFOREST_KEY` (Settings → Secrets and variables → Actions).
-
 ## 2. Cross-compile in Qt Creator
 
 This is the day-to-day development loop: build on the PC, deploy and debug on the
